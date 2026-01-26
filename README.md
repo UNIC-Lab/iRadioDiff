@@ -22,4 +22,54 @@ For more RM information, please visit the repo of [Awesome-Radio-Map-Categorized
 
 This is the code of "**iRadioDiff: Physics Informed Diffusion Model for Effective Indoor Radio Map Construction and Localization**" submitted to the IEEE ICC 2026.
 
-The code will come soon.
+
+## :sunny: Before Starting
+
+1. install torch
+~~~
+conda create -n radiodiff python=3.9
+conda avtivate radiodiff
+pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113
+~~~
+2. install other packages.
+~~~
+pip install -r requirement.txt
+~~~
+3. prepare accelerate config.
+~~~
+accelerate config # HOW MANY GPUs YOU WANG TO USE.
+~~~
+
+## :sparkler: Prepare Data
+
+##### We used the [Indoor Radio Map Dataset](https://indoorradiomapchallenge.github.io/dataset.html) dataset for model training and testing.
+
+- The data structure should look like:
+
+```commandline
+|-- $ICASSP2025_Dataset
+|   |-- Input
+|   |-- |-- Task_1_ICASSP
+|   |-- |-- |-- B1_Ant1_f1_S0.PNG
+|   |-- |-- |-- B1_Ant1_f1_S1.PNG
+|   ...
+|   |-- Output
+|   |-- |-- Task_1_ICASSP
+|   |-- |-- |-- B1_Ant1_f1_S0.PNG
+|   |-- |-- |-- B1_Ant1_f1_S1.PNG
+|	...
+```
+## :tada: Training
+~~~
+accelerate launch train_cond_ldm.py --cfg ./configs/ICA_dm.yaml
+~~~
+
+## V. Inference.
+make sure your model weight path is added in the config file `./configs/ICA_dm.yaml` (**line 66**), and run:
+~~~
+python sample_cond_ldm.py --cfg ./configs/ICA_dm.yaml
+~~~
+Note that you can modify the `sampling_timesteps` (**line 7**) to control the inference speed.
+
+## Thanks
+Thanks to the base code [DDM-Public](https://github.com/GuHuangAI/DDM-Public).
