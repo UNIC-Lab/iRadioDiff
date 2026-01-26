@@ -20,7 +20,7 @@ For more RM information, please visit the repo of [Awesome-Radio-Map-Categorized
 
 ---
 
-This is the code of "**iRadioDiff: Physics Informed Diffusion Model for Effective Indoor Radio Map Construction and Localization**" submitted to the IEEE ICC 2026.
+This is the code of "**iRadioDiff: Physics Informed Diffusion Model for Effective Indoor Radio Map Construction and Localization**" accepted by the IEEE ICC 2026.
 
 
 ## :sunny: Before Starting
