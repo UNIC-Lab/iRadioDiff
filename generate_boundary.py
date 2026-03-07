@@ -279,7 +279,7 @@ def main(args):
         tx_pos = (row['X'], row['Y'])
         
         input_path = os.path.join(args.input_dir, filename)
-        output_path = os.path.join(args.output_dir, f"boundary_{base_name}.png")  # 保持包括 _S{id}
+        output_path = os.path.join(args.output_dir, f"boundary_{base_name}.png") 
 
         try:
             # Extract obstacle contours and transmittance map
@@ -316,8 +316,8 @@ if __name__ == '__main__':
     #     '--output-dir', './BoundaryMaps'
     # ])
     args = parser.parse_args([
-        '--input-dir', 'ICASSP2025_Dataset/ICASSP2025_Dataset/Inputs/Task_1_ICASSP',
-        '--positions-dir', 'ICASSP2025_Dataset/ICASSP2025_Dataset/Positions',
+        '--input-dir', './ICASSP2025_Dataset/Inputs/Task_1_ICASSP',
+        '--positions-dir', './ICASSP2025_Dataset/Positions',
         '--output-dir', './BoundaryMaps'
     ])
 
