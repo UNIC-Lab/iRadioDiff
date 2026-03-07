@@ -42,7 +42,8 @@ data:
   augment_horizontal_flip: False
   batch_size: 1
   num_workers: 4
-
+  use_boundary: True
+  
 trainer:
   gradient_accumulate_every: 1
   lr: !!float 8e-5
