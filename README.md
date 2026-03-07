@@ -44,6 +44,13 @@ accelerate config # HOW MANY GPUs YOU WANG TO USE.
 
 ##### We used the [Indoor Radio Map Dataset](https://indoorradiomapchallenge.github.io/dataset.html) dataset for model training and testing.
 
+- Before training or inference, you should first generate the boundary maps and place them under `BoundaryMaps` in the dataset root directory. This step is required because the dataloader reads boundary files from `$ICASSP2025_Dataset/BoundaryMaps` with filenames in the format `boundary_<original_input_filename>.png`.
+
+- You can generate them with `generate_boundary.py` :
+~~~bash
+python generate_boundary.py --input-dir ./ICASSP2025_Dataset/Inputs/Task_1_ICASSP --positions-dir ./ICASSP2025_Dataset/Positions --output-dir ./ICASSP2025_Dataset/BoundaryMaps
+~~~
+
 - The data structure should look like:
 
 ```commandline
@@ -52,6 +59,14 @@ accelerate config # HOW MANY GPUs YOU WANG TO USE.
 |   |-- |-- Task_1_ICASSP
 |   |-- |-- |-- B1_Ant1_f1_S0.PNG
 |   |-- |-- |-- B1_Ant1_f1_S1.PNG
+|   ...
+|   |-- Positions
+|   |-- |-- Positions_B1_Ant1_f1.csv
+|   |-- |-- Positions_B1_Ant1_f2.csv
+|   ...
+|   |-- BoundaryMaps
+|   |-- |-- boundary_B1_Ant1_f1_S0.png
+|   |-- |-- boundary_B1_Ant1_f1_S1.png
 |   ...
 |   |-- Output
 |   |-- |-- Task_1_ICASSP
@@ -67,7 +82,7 @@ accelerate launch train_cond_dpm.py --cfg ./configs/ICA_dm.yaml
 ## V. Inference.
 make sure your model weight path is added in the config file `./configs/ICA_dm.yaml` (**line 66**), and run:
 ~~~
-python sample_cond_ldm.py --cfg ./configs/ICA_dm.yaml
+python sample_cond_dpm.py --cfg ./configs/ICA_dm.yaml
 ~~~
 Note that you can modify the `sampling_timesteps` (**line 7**) to control the inference speed.
 
