@@ -61,7 +61,7 @@ accelerate config # HOW MANY GPUs YOU WANG TO USE.
 ```
 ## :tada: Training
 ~~~
-accelerate launch train_cond_ldm.py --cfg ./configs/ICA_dm.yaml
+accelerate launch train_cond_dpm.py --cfg ./configs/ICA_dm.yaml
 ~~~
 
 ## V. Inference.
