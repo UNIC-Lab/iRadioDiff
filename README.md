@@ -26,10 +26,11 @@ This is the code of "**iRadioDiff: Physics Informed Diffusion Model for Effectiv
 ## :sunny: Before Starting
 
 1. install torch
+We have verified that the project can run with Python 3.10, PyTorch 2.2.0, torchvision 0.17.0, torchaudio 2.2.0, and CUDA 12.1.
 ~~~
-conda create -n radiodiff python=3.9
+conda create -n radiodiff python=3.10
 conda activate radiodiff
-pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113
+conda install pytorch==2.2.0 torchvision==0.17.0 torchaudio==2.2.0 pytorch-cuda=12.1 -c pytorch -c nvidia
 ~~~
 2. install other packages.
 ~~~
