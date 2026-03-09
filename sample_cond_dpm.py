@@ -3,6 +3,7 @@ import argparse
 import math
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from tqdm.auto import tqdm
 from ema_pytorch import EMA
 from accelerate import Accelerator, DistributedDataParallelKwargs
@@ -150,45 +151,52 @@ class Sampler(object):
     def sample(self):
         accelerator = self.accelerator
         device = accelerator.device
-        batch_num = self.batch_num
         with torch.no_grad():
-            # self.model.eval()
+            self.model.eval()
+            psnr = 0.
+            num = 0
             for idx, batch in tqdm(enumerate(self.dl)):
                 for key in batch.keys():
                     if isinstance(batch[key], torch.Tensor):
                         batch[key].to(device)
-                
-            #for idx in tqdm(range(batch_num)):
-                # if idx == batch_num - 1:
-                #     real_batch_szie = self.sample_num - (batch_num - 1) * self.batch_size
-                # else:
-                #     real_batch_szie = self.batch_size
+                image = batch["image"]
+                image = unnormalize_to_zero_to_one(image)
+                cond = batch['cond']
+                bs = cond.shape[0]
                 if self.rk45:
-                    batch_pred, nfe = self.rk45_sample(batch_size=real_batch_szie)
+                    batch_pred, nfe = self.rk45_sample(batch_size=bs)
                 else:
                     if isinstance(self.model, nn.parallel.DistributedDataParallel):
-                        batch_pred = self.model.module.sample(batch_size=batch['cond'].shape[0], cond=batch['cond'])
+                        batch_pred = self.model.module.sample(batch_size=bs, cond=cond)
                     elif isinstance(self.model, nn.Module):
-                        batch_pred = self.model.sample(batch_size=batch['cond'].shape[0], cond=batch['cond'])
-                for j in range(batch_pred.shape[0]):
-                    img = batch_pred[j]
-                    img_id = idx * self.batch_size + j
-                    file_name = f'{img_id: 010d}.png'
-                    file_name = self.results_folder / file_name
-                    tv.utils.save_image(img, str(file_name))
+                        batch_pred = self.model.sample(batch_size=bs, cond=cond)
 
-                    if img.dim() == 3:
-                        img = img.unsqueeze(0) 
-                    original_images = batch['image']
-                    original_images = torch.clamp((original_images + 1.0) / 2.0, 0.0, 1.0)
+                for j, (img, c) in enumerate(zip(batch_pred, cond)):
+                    img_name = batch["img_name"][j]
+                    psnr += -10. * torch.log10(F.mse_loss(batch_pred[j], image[j]))
+                    num += 1
+                    # img = batch_pred[j]
+                    # img_id = idx * self.batch_size + j
+                    # file_name = f'{img_id: 010d}.png'
+                    # file_name = self.results_folder / file_name
+                    # tv.utils.save_image(img, str(file_name))
+                    # file_name = f'{img_id: 010d}.png'
+                    # file_name = self.results_folder_cond / file_name
+                    file_name = self.results_folder / img_name
+                    tv.utils.save_image(img, str(file_name)[:-4] + ".png")
 
-                    comparison_images = torch.cat([original_images, img], dim=0)
-                    
-                    tv.utils.save_image(comparison_images,
-                                        str(self.results_folder / f'comparison-{idx}.png'),
-                                        nrow=2) 
-                    
+                    # if img.dim() == 3:
+                    #     img = img.unsqueeze(0)
+                    # original_images = batch['image']
+                    # original_images = torch.clamp((original_images + 1.0) / 2.0, 0.0, 1.0)
 
+                    # comparison_images = torch.cat([original_images, img], dim=0)
+
+                    # tv.utils.save_image(comparison_images,
+                    #                     str(self.results_folder / f'comparison-{idx}.png'),
+                    #                     nrow=2)
+
+            print('PSNR: ', psnr / num)
         accelerator.print('sampling complete')
 
     def cal_fid(self, target_path):
